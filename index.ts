@@ -1,4 +1,4 @@
-import Server from "./clases/server";
+import Server from "./classes/server";
 import { SERVER_PORT } from "./global/enviorement";
 import router from "./routes/router";
 import bodyParser from "body-parser";

@@ -2,17 +2,60 @@
 import { Router, Request, Response } from 'express';
 import Server from '../classes/server';
 import { usuariosConectados } from '../sockets/socket';
+import { GraficaData } from '../classes/grafica';
+import { Mapa } from '../classes/mapa';
 
 const router = Router();
+const grafica = new GraficaData();
+export const mapa = new Mapa();
+
+const lugares = [{
+    id:'1',
+    nombre: 'Txurdinaga',
+    lat: 43.2574332,
+    lng: -2.9142822
+},
+{
+    id: '2',
+    nombre: 'Miribilla',
+    lat: 43.2535788,
+    lng: -2.9355099
+},
+{
+    id: '3',
+    nombre: 'Ripa',
+    lat: 43.2618299,
+    lng: -2.9266752
+}];
+
+mapa.marcadores.push(...lugares);
+
+// GET - todos los marcadores
+
+router.get('/mapa' , (req: Request , res: Response)=>{
+    res.json( mapa.getMarcadores());
+});
 
 
+router.get('/grafica', ( req: Request, res: Response  ) => {
 
-router.get('/mensajes', ( req: Request, res: Response  ) => {
+    res.json( grafica.getDatosGrafica());
 
-    res.json({
-        ok: true,
-        mensaje: 'Todo esta bien!!'
-    });
+});
+
+router.post('/grafica', ( req: Request, res: Response  ) => {
+
+    const mes = req.body.mes;
+    const valores = Number( req.body.valores );
+
+    const server = Server.instance;
+
+    server.io.emit( 'cambio-grafica' , grafica.getDatosGrafica() );
+    grafica.aumentaValor( mes , valores);
+
+    res.json(
+        grafica.getDatosGrafica()
+    );
 
 });
 

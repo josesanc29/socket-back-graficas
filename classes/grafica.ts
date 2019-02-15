@@ -1,6 +1,6 @@
 export class GraficaData {
     private meses: string [] = ['enero' , 'febrero' , 'marzo' , 'abril'];
-    private valores: number[] = [5 , 65 , 28 , 9]; 
+    private valores: number[] = [0 , 0 , 0 , 0]; 
 
     constructor(){
 

@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { SERVER_PORT } from '../global/environment';
+import { SERVER_PORT } from '../global/enviorement';
 import socketIO from 'socket.io';
 import http from 'http';
 
@@ -41,6 +41,15 @@ export default class Server {
 
         this.io.on('connection', cliente => {
 
+            // Mapas añadir marcador
+            socket.marcadorNuevo(cliente);
+            
+            // Mapas borrar marcador
+            socket.borrarMarcador(cliente);
+            
+            // Mapas mover marcador
+            socket.marcadorMover(cliente);
+            
             // Conectar cliente
             socket.conectarCliente( cliente, this.io );
 

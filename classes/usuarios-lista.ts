@@ -41,7 +41,7 @@ export class UsuariosLista {
     // Obtener un usuario
     public getUsuario( id: string ) {
 
-        return this.lista.find( usuario => usuario.id === id );
+        return this.lista.filter((usuario: any) =>{ usuario.id === id });
 
     }
 
