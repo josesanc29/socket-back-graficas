@@ -41,6 +41,15 @@ export default class Server {
 
         this.io.on('connection', cliente => {
 
+            //Tickets escuchar/emit numero de escritorio
+            socket.escritorio(cliente , this.io);
+            
+            // Tickets siguiente ticket 
+            socket.siguienteTicket(cliente , this.io);
+            
+            //Tickets atender Socket
+            socket.atenderTicket(cliente , this.io);
+
             // Mapas añadir marcador
             socket.marcadorNuevo(cliente);
             

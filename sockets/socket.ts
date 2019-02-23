@@ -4,9 +4,57 @@ import { UsuariosLista } from '../classes/usuarios-lista';
 import { Usuario } from '../classes/usuario';
 import { Marcador } from '../classes/marcador';
 import { mapa } from '../routes/router';
+import { TicketControl } from '../classes/ticket-control';
+import { Ticket } from '../classes/ticket';
 
 
 export const usuariosConectados = new UsuariosLista();
+
+const ticketControl = new TicketControl();
+
+// Sistema de tickets
+// Siguiente ticket socket-io
+export const siguienteTicket = ( cliente: Socket, io: socketIO.Server ) => {
+
+    cliente.on('siguiente', (ticket: TicketControl , callback: Function  ) => {
+        let siguiente = ticket.obtenerSiguiente();
+        callback(siguiente);
+        io.emit ('siguiente' , {actual: ticketControl.getUltimoTicket() , ultimos4: ticketControl.getUltimos4()});
+    });
+    // cliente.broadcast.emit('estado-actual' , {actual : ticketControl.getUltimoTicket() , ultimos4: ticketControl.getUltimos4()});
+
+}
+
+// Atender ticket socket-io
+export const atenderTicket = ( cliente: Socket , io: socketIO.Server ) => {
+    cliente.on('atender' , ( ticket:Ticket , callback: Function) => {
+        let escritorio = ticket.escritorio;
+        if ( !ticket.escritorio ) {
+            return 'El escritorio del ticket es obligatorio';
+        }
+        console.log(escritorio);
+        let atenderTicket = ticketControl.atenderTicket(escritorio);
+        console.log(atenderTicket);
+        callback(atenderTicket);
+
+        io.emit('atender' , {ultimos4: ticketControl.getUltimos4()});
+    });
+    // cliente.broadcast.emit('ultimos-cuatro' , { ultimos4 : ticketControl.getUltimos4()});
+}
+
+// Socket Escritorio
+export const escritorio = ( cliente: Socket, io: socketIO.Server ) => {
+
+    cliente.on('escritorio', (  payload: { escritorio: number }  ) => {
+
+        console.log('Escritorio recibido', payload );
+
+        io.emit('escritorio', payload );
+
+    });
+
+}
+
 
 // Mapas añadir marcador nuevo
 export const marcadorNuevo = ( cliente: Socket) => {

@@ -4,10 +4,12 @@ import Server from '../classes/server';
 import { usuariosConectados } from '../sockets/socket';
 import { GraficaData } from '../classes/grafica';
 import { Mapa } from '../classes/mapa';
+import { TicketControl } from '../classes/ticket-control';
 
 const router = Router();
 const grafica = new GraficaData();
 export const mapa = new Mapa();
+const ticketControl = new TicketControl()
 
 const lugares = [{
     id:'1',
@@ -30,13 +32,39 @@ const lugares = [{
 
 mapa.marcadores.push(...lugares);
 
-// GET - todos los marcadores
+// GET todos los tickets ultimos
+router.get('/tickets/ultimos' , (req:Request , res: Response)=>{
+    res.json( ticketControl.getUltimos4() );
+});
 
+//GET tickets guardados
+router.get('/tickets' , (req: Request , res: Response)=>{
+    res.json( ticketControl.guardarCambios());
+});
+
+// POST de numero escritorio
+router.post('/tickets/:id' , (req: Request , res: Response)=>{
+    const escritorio = req.params.escritorio;
+    const payload = {
+        escritorio
+    }
+    const server = Server.instance;
+    server.io.emit('escritorio' , payload);
+    res.json({
+        ok: true,
+        escritorio
+    });
+
+});
+
+
+
+// GET - todos los marcadores
 router.get('/mapa' , (req: Request , res: Response)=>{
     res.json( mapa.getMarcadores());
 });
 
-
+// Graficas
 router.get('/grafica', ( req: Request, res: Response  ) => {
 
     res.json( grafica.getDatosGrafica());
