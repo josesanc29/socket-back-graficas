@@ -1,98 +1,70 @@
 import { Ticket } from "./ticket";
 
-
-export class TicketControl {
+export class ticketControl {
 
     tickets: Ticket[] = [];
-    escritorios: number[] = [];
-    ultimos4: Ticket[] = [];
-    ultimo: number;
-    hoy: number;
-    datos: any = { 
-                     "ultimo":11,
-                     "hoy":23,
-                     "tickets":[
-                         {"numero":5,"escritorio":"1"},
-                         {"numero":6,"escritorio":"1"},
-                         {"numero":7,"escritorio":"1"},
-                         {"numero":8,"escritorio":"1"},
-                         {"numero":9,"escritorio":"2"},
-                         {"numero":10,"escritorio":"3"},
-                         {"numero":11,"escritorio":"3"}],
-                         "ultimos4":[
-                             {"numero":4,"escritorio":"2"},
-                             {"numero":3,"escritorio":"2"},
-                             {"numero":2,"escritorio":"2"},
-                             {"numero":1,"escritorio":"3"}
-                    ]}
-        
-    constructor(){ 
+    hoy: number = new Date().getDay();
 
-        // if( this.datos.hoy ) {
+    constructor(){}
 
-            this.tickets = this.datos.tickets;
-            this.ultimos4 = this.datos.ultimos4;
-            this.ultimo = this.datos.ultimo;
-            this.hoy = this.datos.hoy
-        // } else {
-        //     //Llamar a funcion que reinicie todo el conteo de tickets
-        //     this.reiniciarConteoTickets();
-        // }
+    
+    getMarcadores() {
+        return this.tickets;
     }
-
+    
     getUltimoTicket() {
-        return `Ticket ${ this.ultimo }`;
+        let ultimo = this.tickets[0];
+        // this.tickets.shift();
+        console.log(ultimo);
+
+        return ultimo;    
     }
 
     getUltimos4() {
-        return this.ultimos4;
-    }
-    
-    obtenerSiguiente(){
-        this.ultimo += 1;
-        let ticket = new Ticket ( this.ultimo , 'ticket-siguiente' , this.ultimo , this.hoy );
-        this.tickets.push(ticket);
-        console.log('obtengo siguiente en array tickets' , this.tickets);
-        console.log('siguiente' , ticket);
-        //LLamar funcion para guardar cambios
-        this.guardarCambios();
-        return ticket;
+        return this.tickets.slice(0, 4);
     }
 
-    atenderTicket( escritorio: string){
+    añadirNuevo( ticket: Ticket ){
+        // const ultimo += 1;
+        let nuevoticket = new Ticket (ticket.numero , ticket.escritorio);
+        this.tickets.push(nuevoticket);
+        console.log('lista de tickets al añadir uno nuevo....' , this.tickets);
+        console.log('nuevo ticket....' , nuevoticket);
+        //LLamar funcion para guardar cambios
+        this.guardarCambios();
+        return nuevoticket;
+    }
+
+    atenderTicket(){
+        
         if (this.tickets.length === 0) {
             return `No hay tickets ===> ${this.tickets}`;
         }
         
-        let numeroTicket = this.tickets[0].numero;
-        this.tickets.shift();
-
-        let atenderTicket = new Ticket (numeroTicket , escritorio , this.ultimo , this.hoy);
-        this.ultimos4.unshift(atenderTicket);
+        let ultimoTicket = this.getUltimoTicket();
         
-        if (this.ultimos4.length > 4){
-            this.ultimos4.splice( -1 , 1);
-            console.log('Ultimos 4 Tickets  ' , this.ultimos4);
+        if(this.tickets.length > 4){
+            this.tickets.splice( -1 , 1);
+            console.log('Ultimos 4 Tickets  ' , this.tickets);
         }
         //LLamar funcion para guardar cambios
         this.guardarCambios();
-        return atenderTicket;
+        return ultimoTicket;
     }
-    reiniciarConteoTickets(){
-        this.tickets = [];
-        this.ultimos4 = [];
-        this.ultimo = 0;
 
+    reiniciarConteoTickets(){
+
+        this.tickets = [];
         //LLamar funcion para guardar cambios
         this.guardarCambios();
 
     }
 
     guardarCambios(){
+
         let cambioActual = {
-            ultimo: this.ultimo,
-            tickets: this.tickets,
-            ultimos: this.ultimos4
+            // ultimo: this.ultimo,
+            tickets: this.tickets
         }
         // const cambioActual = window.localStorage.setItem('tickets-guardados' , JSON.stringify(objCambios));
         console.log(cambioActual);

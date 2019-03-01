@@ -4,57 +4,51 @@ import { UsuariosLista } from '../classes/usuarios-lista';
 import { Usuario } from '../classes/usuario';
 import { Marcador } from '../classes/marcador';
 import { mapa } from '../routes/router';
-import { TicketControl } from '../classes/ticket-control';
 import { Ticket } from '../classes/ticket';
+import { ticketControl } from '../classes/ticket-control';
 
 
 export const usuariosConectados = new UsuariosLista();
 
-const ticketControl = new TicketControl();
 
 // Sistema de tickets
-// Siguiente ticket socket-io
-export const siguienteTicket = ( cliente: Socket, io: socketIO.Server ) => {
-
-    cliente.on('siguiente', (ticket: TicketControl , callback: Function  ) => {
-        let siguiente = ticket.obtenerSiguiente();
-        callback(siguiente);
-        io.emit ('siguiente' , {actual: ticketControl.getUltimoTicket() , ultimos4: ticketControl.getUltimos4()});
-    });
-    // cliente.broadcast.emit('estado-actual' , {actual : ticketControl.getUltimoTicket() , ultimos4: ticketControl.getUltimos4()});
-
-}
-
-// Atender ticket socket-io
-export const atenderTicket = ( cliente: Socket , io: socketIO.Server ) => {
-    cliente.on('atender' , ( ticket:Ticket , callback: Function) => {
-        let escritorio = ticket.escritorio;
-        if ( !ticket.escritorio ) {
-            return 'El escritorio del ticket es obligatorio';
-        }
-        console.log(escritorio);
-        let atenderTicket = ticketControl.atenderTicket(escritorio);
-        console.log(atenderTicket);
-        callback(atenderTicket);
-
-        io.emit('atender' , {ultimos4: ticketControl.getUltimos4()});
-    });
-    // cliente.broadcast.emit('ultimos-cuatro' , { ultimos4 : ticketControl.getUltimos4()});
-}
-
-// Socket Escritorio
+// Socket  Emito el numero de Escritorio via sockets
 export const escritorio = ( cliente: Socket, io: socketIO.Server ) => {
 
     cliente.on('escritorio', (  payload: { escritorio: number }  ) => {
-
-        console.log('Escritorio recibido', payload );
-
         io.emit('escritorio', payload );
 
     });
 
 }
+// Nuevo Ticket con sockets
+export const nuevoTicket = ( cliente: Socket , io: socketIO.Server) => {
+    // console.log('nuevo ticket' , cliente);
+    cliente.on('nuevo-ticket' , (ticket: ticketControl)=>{
+        console.log('cliente on en nuevo ticket ', ticket);
+        io.emit('nuevo-ticket' , ticket);
+    });
+}
+//Atender ticket con sockets
+export const atiendeTicket = (cliente: Socket , io: socketIO.Server) => {
+    // console.log('atiendo ticket' , cliente);
+    cliente.on('atiendo-ticket' , (ticket: ticketControl)=>{
+        console.log('cliente on en atiendo ticket ', ticket);
+        io.emit('atiendo-ticket' , ticket);
+    });
+    
 
+}
+//Emitir el ultimo ticket para atenderlo via socket
+export const ultimoTicket = (cliente: Socket , io: socketIO.Server) => {
+    // console.log('nuevo ticket' , cliente);
+    cliente.on('ultimo' , (ticket: ticketControl )=>{
+        console.log('cliente on en ultimo ticket ', ticket);
+        // ticket.getUltimoTicket();
+        io.emit('ultimo' , ticket);
+    });
+    
+}
 
 // Mapas añadir marcador nuevo
 export const marcadorNuevo = ( cliente: Socket) => {
@@ -83,7 +77,6 @@ export const borrarMarcador = ( cliente: Socket) => {
  export const marcadorMover = ( cliente: Socket ) => {
 
     cliente.on( 'marcador-mover', ( marcador ) => {
-
         mapa.moverMarcador( marcador );
         cliente.broadcast.emit( 'marcador-mover', marcador );
     });

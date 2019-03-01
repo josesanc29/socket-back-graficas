@@ -44,11 +44,14 @@ export default class Server {
             //Tickets escuchar/emit numero de escritorio
             socket.escritorio(cliente , this.io);
             
-            // Tickets siguiente ticket 
-            socket.siguienteTicket(cliente , this.io);
+            // Atender ticket
+            socket.atiendeTicket(cliente , this.io);
             
-            //Tickets atender Socket
-            socket.atenderTicket(cliente , this.io);
+            //Nuevo ticket
+            socket.nuevoTicket(cliente , this.io);
+            
+            //Obten el ultimo ticket de la cola
+            socket.ultimoTicket(cliente , this.io);
 
             // Mapas añadir marcador
             socket.marcadorNuevo(cliente);

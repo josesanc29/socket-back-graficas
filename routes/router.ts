@@ -4,12 +4,15 @@ import Server from '../classes/server';
 import { usuariosConectados } from '../sockets/socket';
 import { GraficaData } from '../classes/grafica';
 import { Mapa } from '../classes/mapa';
-import { TicketControl } from '../classes/ticket-control';
+import { Ticket } from '../classes/ticket';
+import { ticketControl } from '../classes/ticket-control';
+
 
 const router = Router();
 const grafica = new GraficaData();
 export const mapa = new Mapa();
-const ticketControl = new TicketControl()
+export const controlTicket = new ticketControl()
+
 
 const lugares = [{
     id:'1',
@@ -30,16 +33,29 @@ const lugares = [{
     lng: -2.9266752
 }];
 
-mapa.marcadores.push(...lugares);
+ const ticketsInitial = [
+     { numero : 1 , escritorio: 'mesa 1'},
+     { numero : 2 , escritorio: 'mesa 1'},
+     { numero : 3 , escritorio: 'mesa 2'},
+     { numero : 4 , escritorio: 'mesa 3'},
+     { numero : 5 , escritorio: 'mesa 4'
+    }];
 
-// GET todos los tickets ultimos
+mapa.marcadores.push(...lugares);
+controlTicket.tickets.push(...ticketsInitial);
+
+// GET todos los tickets ultimos 4
 router.get('/tickets/ultimos' , (req:Request , res: Response)=>{
-    res.json( ticketControl.getUltimos4() );
+    res.json( controlTicket.getUltimos4());
 });
+// Obtener el ultimo ticket
+router.get('/tickets/ultimo-ticket' , ( req: Request , res: Response)=>{
+    res.json( controlTicket.getUltimoTicket());
+})
 
 //GET tickets guardados
 router.get('/tickets' , (req: Request , res: Response)=>{
-    res.json( ticketControl.guardarCambios());
+    res.json( controlTicket.guardarCambios());
 });
 
 // POST de numero escritorio
@@ -56,8 +72,6 @@ router.post('/tickets/:id' , (req: Request , res: Response)=>{
     });
 
 });
-
-
 
 // GET - todos los marcadores
 router.get('/mapa' , (req: Request , res: Response)=>{
